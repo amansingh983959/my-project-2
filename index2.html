@@ -1,0 +1,274 @@
+<!-- Stunning Interactive Portfolio - Single File HTML/CSS/JS
+     Features:
+     - Responsive modern layout
+     - Hero with typewriter effect
+     - Project cards with modal preview
+     - Animated skills bar
+     - Dark/light theme toggle (persisted in localStorage)
+     - Contact form (mailto) and downloadable resume link (placeholder)
+     - CSS-only decorative shapes + subtle transitions
+     - Built-in comments to help you customize
+
+  Save this as `index.html` and open in any browser.
+-->
+
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stunning Portfolio — Aman Singh</title>
+  <meta name="description" content="Interactive portfolio with animations, projects, skills and contact.">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- tiny placeholder -->
+  <style>
+    /* ====== Reset & base ====== */
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#7c3aed; --glass:rgba(255,255,255,0.04);
+      --gradient: linear-gradient(135deg,var(--accent),#06b6d4);
+      --radius:14px; --maxw:1100px; --mono:ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    }
+    [data-theme="light"]{ --bg:#f7fbff; --card:#ffffff; --muted:#475569; --accent:#0ea5a0; --glass:rgba(2,6,23,0.04);} 
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial; background:var(--bg); color:var(--card); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--maxw);margin:40px auto;padding:24px}
+
+    /* ====== Header ====== */
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:var(--gradient);display:grid;place-items:center;color:white;font-weight:700;font-family:var(--mono);box-shadow:0 6px 24px rgba(2,6,23,0.6)}
+    nav{display:flex;gap:12px}
+    nav a{padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:600}
+    nav a.primary{background:var(--glass);color:var(--card)}
+
+    /* ====== Hero ====== */
+    .hero{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:center}
+    .hero-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:28px;border-radius:var(--radius);backdrop-filter: blur(6px);box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    .eyebrow{display:inline-block;background:var(--glass);padding:6px 10px;border-radius:10px;color:var(--muted);font-size:13px}
+    h1{margin:12px 0 6px;font-size:34px;line-height:1.03;color:white}
+    .type{color:var(--accent);font-weight:700}
+    p.lead{color:var(--muted);margin:12px 0 18px}
+    .cta{display:flex;gap:12px}
+    .btn{padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer;border:none}
+    .btn.primary{background:var(--gradient);color:white}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--card)}
+
+    /* Hero right: profile */
+    .profile{background:var(--card);color:var(--bg);padding:18px;border-radius:16px}
+    .avatar{width:100%;border-radius:12px;overflow:hidden;margin-bottom:14px}
+    .avatar img{width:100%;display:block}
+    .stats{display:flex;gap:10px;justify-content:space-between}
+    .stat{flex:1;text-align:center;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px}
+    .stat b{display:block;font-size:18px}
+
+    /* ====== Projects ====== */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+    .card{background:var(--card);padding:16px;border-radius:12px;position:relative;overflow:hidden}
+    .card h3{margin:0 0 6px;color:white}
+    .card p{margin:0;color:var(--muted);font-size:14px}
+    .tags{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .tag{font-size:12px;padding:6px 8px;border-radius:999px;background:var(--glass);color:var(--muted)}
+
+    /* ====== Skills ====== */
+    .skills{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+    .skill{background:var(--card);padding:12px;border-radius:12px}
+    .bar{height:12px;background:linear-gradient(90deg, rgba(255,255,255,0.06), transparent);border-radius:8px;overflow:hidden;margin-top:8px}
+    .fill{height:100%;border-radius:8px;width:0%;transition:width 1100ms cubic-bezier(.2,.9,.2,1)}
+
+    /* ====== Contact ====== */
+    footer{margin-top:34px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+    .contact-card{background:var(--card);padding:16px;border-radius:12px;flex:1}
+
+    /* ====== Modal ====== */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);z-index:60}
+    .modal.active{display:flex}
+    .modal .inner{width:min(900px,96%);background:var(--card);padding:18px;border-radius:14px}
+
+    /* ====== Responsive ====== */
+    @media (max-width:980px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.profile{order:-1}}
+    @media (max-width:600px){.grid{grid-template-columns:1fr}.skills{grid-template-columns:1fr}}
+
+    /* small helper */
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="container" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">AS</div>
+        <div>
+          <div style="font-weight:800;color:white">Aman Singh</div>
+          <div style="font-size:12px;color:var(--muted)">Full-stack & UI enthusiast</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#projects" class="primary">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact" class="ghost">Contact</a>
+        <button id="themeToggle" class="btn">Toggle</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <span class="eyebrow">New — 2025 Interactive Demo</span>
+          <h1>Designer & Developer. <span class="type" id="typed">Creating delightful experiences</span></h1>
+          <p class="lead">User-focused web apps, animations and small delightful interactions. Scroll to explore the demo portfolio with animated skill bars, project previews and a contact form.</p>
+          <div class="cta">
+            <button class="btn primary" onclick="openModal(0)">View Featured</button>
+            <a class="btn ghost" href="#projects">See Projects</a>
+          </div>
+
+          <div class="skills" style="margin-top:18px">
+            <div class="skill">
+              <div style="display:flex;justify-content:space-between"><strong>HTML & CSS</strong><span class="muted">95%</span></div>
+              <div class="bar"><div class="fill" data-fill="95%" style="background:var(--gradient)"></div></div>
+            </div>
+            <div class="skill">
+              <div style="display:flex;justify-content:space-between"><strong>JavaScript</strong><span class="muted">88%</span></div>
+              <div class="bar"><div class="fill" data-fill="88%" style="background:linear-gradient(90deg,#f97316,#ef4444)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="profile">
+          <div class="avatar"><img src="IMG-20250808-WA0021.jpg" alt="Profile"></div>
+          <h3 style="margin:6px 0;color:white">Aman — UI / Web</h3>
+          <p class="muted">I build small apps, components and experiments that make people smile. This demo is a single-file portfolio you can edit.</p>
+          <div class="stats" style="margin-top:12px">
+            <div class="stat"><b>12+</b><small class="muted">Projects</small></div>
+            <div class="stat"><b>4</b><small class="muted">Years</small></div>
+            <div class="stat"><b>1k</b><small class="muted">Hours</small></div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="projects">
+        <h2 style="color:white;margin-top:30px">Projects</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Interactive Dashboard</h3>
+            <p class="muted">A slick dashboard with charts and filters.</p>
+            <div class="tags"><span class="tag">React</span><span class="tag">D3</span></div>
+            <div style="margin-top:12px"><button class="btn primary" onclick="openModal(1)">Preview</button></div>
+          </article>
+
+          <article class="card">
+            <h3>3D Product Viewer</h3>
+            <p class="muted">WebGL powered product spin & zoom.</p>
+            <div class="tags"><span class="tag">Three.js</span><span class="tag">UX</span></div>
+            <div style="margin-top:12px"><button class="btn primary" onclick="openModal(2)">Preview</button></div>
+          </article>
+
+          <article class="card">
+            <h3>Micro Animations Library</h3>
+            <p class="muted">A collection of small UI micro-interactions.</p>
+            <div class="tags"><span class="tag">CSS</span><span class="tag">Design</span></div>
+            <div style="margin-top:12px"><button class="btn primary" onclick="openModal(3)">Preview</button></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="skills">
+        <h2 style="color:white;margin-top:30px">Skills & Tools</h2>
+        <div class="skills">
+          <div class="skill">
+            <strong>Frontend</strong>
+            <p class="muted">HTML, CSS, modern JS, TypeScript, React</p>
+          </div>
+          <div class="skill">
+            <strong>Design</strong>
+            <p class="muted">Figma, Prototyping, Motion</p>
+          </div>
+        </div>
+      </section>
+
+      <footer id="contact">
+        <div class="contact-card">
+          <h3 style="margin:0;color:white">Get in touch</h3>
+          <p class="muted">Have an idea or a project? Drop a message.</p>
+          <form onsubmit="sendMail(event)" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <input id="name" placeholder="Your name" required style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--card)">
+            <input id="email" placeholder="Email" type="email" required style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--card)">
+            <textarea id="msg" placeholder="Short message" required style="width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--card)"></textarea>
+            <button class="btn primary" type="submit">Send</button>
+            <a class="btn ghost" href="#" onclick="downloadResume()">Download Resume</a>
+          </form>
+        </div>
+        <div style="min-width:220px;text-align:right;color:var(--muted)">
+          <div>Made with ❤️ — <strong>Aman</strong></div>
+          <div style="font-size:13px;margin-top:8px">Theme <span id="themeLabel">Dark</span></div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Modal template -->
+  <div id="modal" class="modal" onclick="closeModal(event)">
+    <div class="inner" role="dialog" aria-modal="true">
+      <button onclick="closeModal(true)" style="float:right" class="btn ghost">Close</button>
+      <div id="modalContent" style="clear:both;padding-top:12px"></div>
+    </div>
+  </div>
+
+  <script>
+    // ====== Theme toggle ======
+    const themeToggle = document.getElementById('themeToggle');
+    const themeLabel = document.getElementById('themeLabel');
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if(saved){ document.documentElement.setAttribute('data-theme', saved); themeLabel.textContent = saved==='light' ? 'Light' : 'Dark'; }
+    else{ document.documentElement.setAttribute('data-theme','dark'); }
+    themeToggle.addEventListener('click', ()=>{
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur==='light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeLabel.textContent = next==='light' ? 'Light' : 'Dark';
+    });
+
+    // ====== Typewriter effect (simple) ======
+    const typeEl = document.getElementById('typed');
+    const phrases = ['Creating delightful experiences','Animating small interactions','Building thoughtful UIs'];
+    let pi=0, ti=0;
+    function tick(){
+      const txt = phrases[pi];
+      typeEl.textContent = txt.slice(0, ti);
+      ti++;
+      if(ti>txt.length){ ti=0; pi=(pi+1)%phrases.length; setTimeout(tick,1000); }
+      else setTimeout(tick,90);
+    }
+    tick();
+
+    // ====== Animate skill bars when visible ======
+    function animateFills(){ document.querySelectorAll('.fill').forEach(el=>{ const w = el.dataset.fill || '70%'; el.style.width = w; }); }
+    // call on load
+    window.addEventListener('load', ()=> setTimeout(animateFills,300));
+
+    // ====== Modal handling (project previews) ======
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modalContent');
+    const projectDetails = [
+      {title:'Featured App', html:'<h2>Featured Interactive App</h2><p class="muted">A demo with live charts and filters. Edit the code and replace with your own.</p><div style="margin-top:12px"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" style="width:100%;border-radius:8px"></div>'},
+      {title:'3D Viewer', html:'<h2>3D Product Viewer</h2><p class="muted">Prototype using WebGL / three.js. Great for product pages.</p>'},
+      {title:'Micro Animations', html:'<h2>Micro Animations</h2><p class="muted">Small CSS + JS interactions for delightful UI.</p>'}
+    ];
+    function openModal(i){ modal.classList.add('active'); modalContent.innerHTML = projectDetails[i]?.html || '<p>Preview</p>'; }
+    function closeModal(e){ if(e===true || e.target===modal) modal.classList.remove('active'); }
+
+    // ====== Contact form (mailto fallback) ======
+    function sendMail(ev){ ev.preventDefault(); const name=document.getElementById('name').value; const email=document.getElementById('email').value; const msg=document.getElementById('msg').value; const subject = encodeURIComponent('Website contact from '+name); const body = encodeURIComponent('Name: '+name+'\nEmail: '+email+'\n\n'+msg); window.location.href = `mailto:your@email.com?subject=${subject}&body=${body}`; }
+    function downloadResume(){ alert('Replace downloadResume() to link to your real resume file.'); }
+
+    // ====== Small accessibility: keyboard close modal ======
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(true); });
+
+    // ====== Smooth scroll for anchor links ======
+    document.querySelectorAll('a[href^="#"]').forEach(a=> a.addEventListener('click', e=>{ const id = a.getAttribute('href'); if(id.length>1){ e.preventDefault(); document.querySelector(id)?.scrollIntoView({behavior:'smooth'}); } }));
+
+  </script>
+</body>
+</html>
